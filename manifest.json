@@ -1,0 +1,48 @@
+{
+  "name": "Geely EX5 EV Tracker",
+  "short_name": "EX5 Tracker",
+  "description": "Track mileage, charging sessions and energy costs for your Geely EX5 Inspire",
+  "id": "/",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#060b14",
+  "theme_color": "#00d4b8",
+  "orientation": "portrait-primary",
+  "categories": ["utilities", "automotive"],
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Log Mileage",
+      "short_name": "Log",
+      "description": "Quickly log your odometer reading",
+      "url": "./index.html",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    }
+  ]
+}

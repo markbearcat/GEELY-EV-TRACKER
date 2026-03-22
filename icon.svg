@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512">
+  <!-- Background -->
+  <rect width="512" height="512" rx="96" ry="96" fill="#060b14"/>
+  <!-- Subtle glow -->
+  <circle cx="256" cy="256" r="220" fill="none" stroke="#00d4b8" stroke-width="1" opacity="0.12"/>
+
+  <defs>
+    <linearGradient id="boltGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#00e5cc"/>
+      <stop offset="100%" stop-color="#007a6e"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Real Geely Logo (white-tinted region behind logo for contrast) -->
+  <rect x="126" y="42" width="260" height="180" rx="16" fill="#f0f6ff" opacity="0.92"/>
+  <image x="136" y="52" width="240" height="160"
+         href="data:image/png;base64,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"
+         preserveAspectRatio="xMidYMid meet"/>
+
+  <!-- Teal accent bar -->
+  <rect x="80" y="234" width="352" height="3" rx="1.5" fill="#00d4b8" opacity="0.4"/>
+
+  <!-- "EX5 INSPIRE" label -->
+  <text x="256" y="286"
+        font-family="Orbitron, monospace" font-size="30" font-weight="900"
+        fill="#00d4b8" text-anchor="middle" letter-spacing="4">EX5</text>
+  <text x="256" y="314"
+        font-family="Orbitron, monospace" font-size="14" font-weight="500"
+        fill="#6a88aa" text-anchor="middle" letter-spacing="6">INSPIRE</text>
+
+  <!-- Teal accent bar -->
+  <rect x="80" y="328" width="352" height="3" rx="1.5" fill="#00d4b8" opacity="0.2"/>
+
+  <!-- Lightning bolt  -->
+  <g transform="translate(196, 354)" filter="url(#glow)">
+    <path d="M 60 0 L 20 56 L 48 56 L 40 96 L 80 40 L 52 40 Z"
+          fill="url(#boltGrad)" stroke="#00e5cc" stroke-width="2"
+          stroke-linejoin="round"/>
+  </g>
+
+  <!-- "GEELY EV TRACKER" footer -->
+  <text x="256" y="490"
+        font-family="Orbitron, monospace" font-size="14" font-weight="700"
+        fill="#384e68" text-anchor="middle" letter-spacing="3">EV TRACKER</text>
+</svg>
