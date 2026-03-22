@@ -14,47 +14,7 @@ Track mileage, charging sessions and energy costs for your **Geely EX5 Inspire**
 
 ---
 
-## Deploy to Netlify
 
-### Option A — Drag & Drop (easiest)
-
-1. Go to [app.netlify.com](https://app.netlify.com) and log in
-2. Click **"Add new site → Deploy manually"**
-3. Drag the entire folder contents (all 5 files) into the deploy box
-4. Done! Netlify gives you a live URL instantly
-
-### Option B — Netlify CLI
-
-```bash
-# Install CLI (once)
-npm install -g netlify-cli
-
-# From this folder:
-netlify deploy --prod --dir .
-```
-
-### Option C — GitHub + Netlify CI
-
-1. Push this folder to a GitHub repo
-2. In Netlify: **"Add new site → Import from Git"**
-3. Select your repo, set **Publish directory** to `.` (root)
-4. Deploy
-
----
-
-## Adding PNG icons (recommended for iOS)
-
-For best iOS home-screen support, generate PNG icons from `icon.svg`:
-
-```bash
-# With ImageMagick:
-convert -size 192x192 icon.svg icon-192.png
-convert -size 512x512 icon.svg icon-512.png
-```
-
-Or use an online tool like [svgtopng.com](https://svgtopng.com), then upload the PNGs alongside the other files.
-
----
 
 ## Features
 
