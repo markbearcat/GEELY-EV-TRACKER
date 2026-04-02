@@ -765,6 +765,40 @@ svg { display: block; }
    TABS CONTENT
    ============================================ */
 /* Diesel comparison tab */
+.fuel-lookup-bar {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--c-card); border: 1px solid var(--c-border);
+  border-radius: var(--radius); padding: 12px 14px; margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.fuel-lookup-label { font-size: 0.78rem; color: var(--c-text-2); flex: 1; min-width: 120px; }
+.fuel-lookup-label strong { color: var(--c-text); }
+.fuel-lookup-inp {
+  width: 90px; padding: 7px 10px;
+  background: var(--c-surface); border: 1px solid var(--c-border);
+  border-radius: var(--radius-sm); color: var(--c-text);
+  font-family: var(--font-mono); font-size: 0.9rem;
+  transition: border-color 0.2s;
+}
+.fuel-lookup-inp:focus { outline: none; border-color: var(--c-amber); }
+.btn-fuel-lookup {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 7px 12px; border-radius: var(--radius-sm);
+  background: var(--c-amber-fill); border: 1px solid var(--c-amber);
+  color: var(--c-amber); font-size: 0.72rem; font-weight: 700;
+  letter-spacing: 0.04em; text-transform: uppercase;
+  cursor: pointer; transition: all 0.2s; text-decoration: none;
+  white-space: nowrap;
+}
+.btn-fuel-lookup:hover { background: var(--c-amber); color: #000; }
+.btn-fuel-set {
+  padding: 7px 12px; border-radius: var(--radius-sm);
+  background: var(--c-green-fill); border: 1px solid var(--c-green);
+  color: var(--c-green); font-size: 0.72rem; font-weight: 700;
+  letter-spacing: 0.04em; text-transform: uppercase;
+  cursor: pointer; transition: all 0.2s;
+}
+.btn-fuel-set:hover { background: var(--c-green); color: #000; }
 .diesel-hero {
   background: linear-gradient(135deg, rgba(245,158,11,0.08), rgba(239,68,68,0.05));
   border: 1px solid rgba(245,158,11,0.2);
@@ -1410,6 +1444,23 @@ svg { display: block; }
           <div class="diesel-hero-sub">Renault Mégane 1.5 dCi — 6.5 L/100 km</div>
           <div class="diesel-hero-sub" style="margin-top:3px;color:var(--c-text-3);">Default price: $2.65/L · edit per period below</div>
         </div>
+      </div>
+
+      <!-- Live fuel price lookup -->
+      <div class="fuel-lookup-bar">
+        <div class="fuel-lookup-label">
+          <strong>Adelaide diesel price</strong><br>
+          Enter today's price or check live prices below
+        </div>
+        <input type="number" class="fuel-lookup-inp" id="cmp-price-inp"
+          placeholder="2.65" min="0.01" step="0.01"
+          oninput="onComparePriceInput()">
+        <button class="btn-fuel-set" onclick="applyComparePrice()">Use This</button>
+        <a href="https://fuelradar.com.au/fuel-prices/adelaide/dsl"
+           target="_blank" rel="noopener" class="btn-fuel-lookup">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><polyline points="15 3 21 3 21 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><line x1="10" y1="14" x2="21" y2="3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          Live Prices
+        </a>
       </div>
 
       <!-- Savings hero -->
@@ -2688,6 +2739,7 @@ function handleImportCSV(input) {
     const iLocN  = col('location_name');
     const iLat   = col('latitude');
     const iLng   = col('longitude');
+    const iDPO   = col('diesel_price_override_aud');
 
     if (iDate === -1 || iOdo === -1) {
       showToast('CSV format not recognised', 'error');
@@ -2795,6 +2847,8 @@ function handleImportCSV(input) {
         const latV = iLat !== -1 ? parseFloat(cols[iLat]) : NaN;
         const lngV = iLng !== -1 ? parseFloat(cols[iLng]) : NaN;
         if (!isNaN(latV) && !isNaN(lngV)) { entry.lat = latV; entry.lng = lngV; }
+        const dpoV = iDPO !== -1 ? parseFloat(cols[iDPO]) : NaN;
+        if (!isNaN(dpoV) && dpoV > 0) entry.dieselPriceOverride = dpoV;
       }
 
       newEntries.push(entry);
@@ -2862,7 +2916,8 @@ function exportCSV() {
     'Date', 'Time', 'Odometer_km', 'Has_Charge',
     'Charge_Type', 'Location_Nickname', 'Total_Cost_AUD', 'Rate_Cents_Per_kWh',
     'Notes', 'Percent_Before', 'Percent_After',
-    'Location_Name', 'Latitude', 'Longitude'
+    'Location_Name', 'Latitude', 'Longitude',
+    'Diesel_Price_Override_AUD'
   ];
 
   const rows = [...state.entries]
@@ -2888,7 +2943,8 @@ function exportCSV() {
         e.hasCharge && e.percentAfter  != null ? e.percentAfter  : '',
         e.locationName || '',
         e.lat || '',
-        e.lng || ''
+        e.lng || '',
+        e.dieselPriceOverride != null ? e.dieselPriceOverride : ''
       ].map(v => `"${v}"`).join(',');
     });
 
@@ -2948,11 +3004,37 @@ function showToast(msg, type = '') {
 // ============================================================
 
 // Get the diesel price that was current on a given date
+// ── Fuel price lookup bar (compare tab) ───────────────────────────────────
+// Tracks a session-level "compare price" override separate from per-entry overrides.
+// Changing it recalculates the default for any entry that has NO per-entry override.
+let comparePriceOverride = null; // null = use DIESEL_DEFAULT_PRICE
+
+function onComparePriceInput() {
+  const inp = document.getElementById('cmp-price-inp');
+  if (inp) inp.dataset.dirty = '1';
+}
+
+function applyComparePrice() {
+  const inp = document.getElementById('cmp-price-inp');
+  if (!inp) return;
+  const val = parseFloat(inp.value);
+  if (isNaN(val) || val <= 0) { showToast('Enter a valid price', 'error'); return; }
+  comparePriceOverride = val;
+  inp.dataset.dirty = '1';
+  renderCompare();
+  showToast('Comparing at $' + val.toFixed(2) + '/L', 'success');
+}
+
+// ── End fuel price lookup bar ────────────────────────────────────────────────
+
 // Get the diesel price for a specific entry (override or default)
 function getEntryDieselPrice(entry) {
-  return (entry && entry.dieselPriceOverride != null)
-    ? entry.dieselPriceOverride
-    : DIESEL_DEFAULT_PRICE;
+  // Per-entry override takes highest priority
+  if (entry && entry.dieselPriceOverride != null) return entry.dieselPriceOverride;
+  // Session-level compare price (set via the lookup bar) is next
+  if (comparePriceOverride != null) return comparePriceOverride;
+  // Fall back to hardcoded default
+  return DIESEL_DEFAULT_PRICE;
 }
 
 // Called when user taps the price chip on a period row
@@ -3018,6 +3100,10 @@ function resetPeriodPrice(entryId) {
 }
 
 function renderCompare() {
+  // Populate price input with current default price
+  const priceInp = document.getElementById('cmp-price-inp');
+  if (priceInp && !priceInp.dataset.dirty) priceInp.value = DIESEL_DEFAULT_PRICE.toFixed(2);
+
   const entries = [...state.entries]
     .filter(e => e.odometer != null)
     .sort((a, b) => new Date(a.date) - new Date(b.date));
