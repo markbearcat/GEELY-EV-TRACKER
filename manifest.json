@@ -2,7 +2,7 @@
   "name": "Geely EX5 EV Tracker",
   "short_name": "EX5 Tracker",
   "description": "Track mileage, charging sessions and energy costs for your Geely EX5 Inspire",
-  "id": "/",
+  "id": "ex5-tracker",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
